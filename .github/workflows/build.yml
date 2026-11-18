@@ -14,7 +14,12 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Extract Project ZIP
-        run: for f in *.zip; do unzip -o "$f"; done
+        run: |
+          for f in *.zip; do
+            if [ -f "$f" ]; then
+              unzip -o "$f" -x ".github/*"
+            fi
+          done
 
       - name: Set up JDK 17
         uses: actions/setup-java@v4
@@ -28,11 +33,11 @@ jobs:
           gradle-version: '8.7'
 
       - name: Build Debug APK
-        run: gradle assembleDebug
+        run: gradle assembleDebug --no-daemon
 
       - name: Upload APK Artifact
         uses: actions/upload-artifact@v4
         with:
-          name: SideswipeAIBot-v4-ProMechanics-APK
+          name: SideswipeAIBot-v6-GamepadFix-APK
           path: app/build/outputs/apk/debug/app-debug.apk
           if-no-files-found: error
