@@ -1,4 +1,4 @@
-name: Build Android APK
+name: Build PS5 Macro Pro APK
 
 on:
   push:
@@ -13,31 +13,32 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Extract Project ZIP
+      - name: Extract ZIP if uploaded directly
         run: |
-          for f in *.zip; do
-            if [ -f "$f" ]; then
-              unzip -o "$f" -x ".github/*"
+          if [ ! -f "settings.gradle" ]; then
+            ZIP_FILE=$(ls *.zip 2>/dev/null | head -n 1)
+            if [ -n "$ZIP_FILE" ]; then
+              unzip -o "$ZIP_FILE"
             fi
-          done
+          fi
 
       - name: Set up JDK 17
         uses: actions/setup-java@v4
         with:
-          java-version: '17'
           distribution: 'temurin'
+          java-version: '17'
 
-      - name: Setup Gradle
+      - name: Set up Gradle 8.7
         uses: gradle/actions/setup-gradle@v4
         with:
           gradle-version: '8.7'
 
       - name: Build Debug APK
-        run: gradle assembleDebug --no-daemon
+        run: gradle assembleDebug --stacktrace
 
       - name: Upload APK Artifact
         uses: actions/upload-artifact@v4
         with:
-          name: SideswipeAIBot-v6-GamepadFix-APK
+          name: PS5MacroPro-APK
           path: app/build/outputs/apk/debug/app-debug.apk
           if-no-files-found: error
